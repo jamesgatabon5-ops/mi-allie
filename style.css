@@ -243,6 +243,20 @@ button.ghost{
 button.ghost:hover{ color:var(--paper); border-color: var(--orange); }
 button:focus-visible{ outline: 2px solid var(--amber); outline-offset:3px; }
 
+.volume-row{
+  position:relative; z-index:2;
+  display:flex; justify-content:center; align-items:center; gap:10px;
+  margin-top:-40px;
+  margin-bottom: 20px;
+  color: var(--paper-dim);
+  font-size: 11px;
+  letter-spacing: .1em;
+}
+.volume-row input[type="range"]{
+  accent-color: var(--orange);
+  width: 120px;
+}
+
 footer{
   position:relative; z-index:2;
   text-align:center;
@@ -257,5 +271,3 @@ footer{
   .glow{ animation:none !important; }
   .cursor{ animation:none !important; }
 }
-
-

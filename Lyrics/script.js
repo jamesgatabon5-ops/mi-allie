@@ -18,9 +18,17 @@ const lyricEl   = document.getElementById('lyricLine');
 const dotsWrap  = document.getElementById('dots');
 const playBtn   = document.getElementById('playBtn');
 const resetBtn  = document.getElementById('resetBtn');
+const bgAudio   = document.getElementById('bgAudio');
+const volumeSlider = document.getElementById('volumeSlider');
 
 let running = false;
 let cancelled = false;
+
+// Initial volume
+bgAudio.volume = parseFloat(volumeSlider.value);
+volumeSlider.addEventListener('input', () => {
+  bgAudio.volume = parseFloat(volumeSlider.value);
+});
 
 LYRICS.forEach((_, i) => {
   const d = document.createElement('span');
@@ -56,6 +64,22 @@ function wait(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function startAudio(){
+  try{
+    bgAudio.currentTime = 0;
+    await bgAudio.play();
+  } catch (err){
+    // Autoplay can still be blocked in some browsers/contexts;
+    // fail silently so the lyric reel keeps working either way.
+    console.warn('Background audio could not start:', err);
+  }
+}
+
+function stopAudio(){
+  bgAudio.pause();
+  bgAudio.currentTime = 0;
+}
+
 async function play(){
   if (running) return;
   running = true;
@@ -64,7 +88,15 @@ async function play(){
   playBtn.textContent = '♪ Playing…';
 
   tonearm.classList.add('dropped');
-  await wait(500);
+  startAudio();
+
+  // Intro instrumental before the vocals kick in
+  const INTRO_DELAY = 16000;
+  await wait(INTRO_DELAY);
+  if (cancelled){
+    running = false;
+    return;
+  }
 
   for (let i = 0; i < LYRICS.length; i++){
     if (cancelled) break;
@@ -89,9 +121,8 @@ function reset(){
   setActiveDot(-1);
   playBtn.disabled = false;
   playBtn.textContent = '▶ Drop the needle';
+  stopAudio();
 }
 
 playBtn.addEventListener('click', play);
 resetBtn.addEventListener('click', reset);
-
-
